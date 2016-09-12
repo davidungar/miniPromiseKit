@@ -10,6 +10,7 @@ import Foundation
 public typealias MiniPromise<ResultType> = GeneralPromise<MiniResult<ResultType>>
 
 
+
 //: Simple GeneralPromise implementation, no errors, no composition
 //: Leaks memory, most likely
 
