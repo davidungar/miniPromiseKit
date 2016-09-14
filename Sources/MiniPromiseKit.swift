@@ -7,11 +7,11 @@
 
 import Foundation
 
-public typealias MiniPromise<ResultType> = GeneralPromise<MiniResult<ResultType>>
+public typealias MiniPromise<ResultType> = UniversalPromise<MiniResult<ResultType>>
 
 
 
-//: Simple GeneralPromise implementation, no errors, no composition
+//: Simple UniversalPromise implementation, no errors, no composition
 //: Leaks memory, most likely
 
 // MARK: - first, basic future without MiniResult
@@ -25,9 +25,9 @@ public func firstly<Result>(execute body: () throws -> MiniPromise<Result>) -> M
 }
 
 
-// A GeneralPromise handles any type of Outcome, and doesn't care about errors.
+// A UniversalPromise handles any type of Outcome, and doesn't care about errors.
 
-public class GeneralPromise<Outcome> {
+public class UniversalPromise<Outcome> {
     private typealias Reader = (Outcome) -> Void
     private var outcomeIfKnown: Outcome?
     private var readerIfKnown: Reader?
@@ -52,7 +52,7 @@ public class GeneralPromise<Outcome> {
     public func resolve(_ outcome: Outcome) -> Void {
         oneAtATime {
             if let reader = self.readerIfKnown {
-                DispatchQueue(label: "GeneralPromise reader", qos: .userInitiated)
+                DispatchQueue(label: "UniversalPromise reader", qos: .userInitiated)
                     .async {
                         reader(outcome)
                 }
@@ -67,9 +67,9 @@ public class GeneralPromise<Outcome> {
         on q: DispatchQueue = .main,
         execute body: @escaping () -> Void
         )
-        -> GeneralPromise
+        -> UniversalPromise
     {
-        let p = GeneralPromise()
+        let p = UniversalPromise()
         whenResolved(on: q) {
             body()
             p.resolve($0)
@@ -97,19 +97,19 @@ public class GeneralPromise<Outcome> {
     public func whenResolved<NewOutcome>(
         on q: DispatchQueue = .main,
         execute transformer: @escaping (Outcome) -> NewOutcome
-        ) -> GeneralPromise<NewOutcome>
+        ) -> UniversalPromise<NewOutcome>
     {
-        let p = GeneralPromise<NewOutcome>()
+        let p = UniversalPromise<NewOutcome>()
         whenResolved(on: q) { p.resolve( transformer( $0 ) ) }
         return p
     }
     
     public func whenResolvedPromise<NewOutcome>(
         on q: DispatchQueue = .main,
-        execute asyncTransformer: @escaping (Outcome) -> GeneralPromise<NewOutcome>
-        ) -> GeneralPromise<NewOutcome>
+        execute asyncTransformer: @escaping (Outcome) -> UniversalPromise<NewOutcome>
+        ) -> UniversalPromise<NewOutcome>
     {
-        let p = GeneralPromise<NewOutcome>()
+        let p = UniversalPromise<NewOutcome>()
         whenResolved(on: q) {
             ($0 |> asyncTransformer).whenResolved(on: q) { p.resolve($0) }
         }
@@ -119,7 +119,7 @@ public class GeneralPromise<Outcome> {
     public func tap(
         on q: DispatchQueue = .main,
         execute body: @escaping (Outcome) -> Void
-        ) -> GeneralPromise
+        ) -> UniversalPromise
     {
         return whenResolved(on: q) {
             body($0)
@@ -148,7 +148,7 @@ extension MiniResult: MiniResultProtocol {
     public static func with( result s: Result) -> MiniResult { return .success(s) }
 }
 
-public extension GeneralPromise where Outcome: MiniResultProtocol {
+public extension UniversalPromise where Outcome: MiniResultProtocol {
     
     public convenience  init(
         resolvers: (
@@ -168,12 +168,12 @@ public extension GeneralPromise where Outcome: MiniResultProtocol {
         }
     }
     
-    public typealias PendingTuple = (promise: GeneralPromise, fulfill: (Outcome.Result) -> Void, reject: (Error) -> Void)
+    public typealias PendingTuple = (promise: UniversalPromise, fulfill: (Outcome.Result) -> Void, reject: (Error) -> Void)
     
     public static func pending() -> PendingTuple {
         var fulfill: ((Outcome.Result) -> Void)!
         var reject: ((Error) -> Void)!
-        let promise = GeneralPromise.init { fulfill = $0; reject = $1 }
+        let promise = UniversalPromise.init { fulfill = $0; reject = $1 }
         return (promise, fulfill, reject)
     }
     
@@ -195,7 +195,7 @@ public extension GeneralPromise where Outcome: MiniResultProtocol {
     public func then<NewResult>(
         on q: DispatchQueue = .main,
         execute body: @escaping (Outcome.Result) throws -> NewResult
-        ) -> GeneralPromise<MiniResult<NewResult>>
+        ) -> UniversalPromise<MiniResult<NewResult>>
     {
         return whenResolved(on: q) {
             outcome -> MiniResult<NewResult> in
@@ -228,7 +228,7 @@ public extension GeneralPromise where Outcome: MiniResultProtocol {
     public func `catch`(
         on q: DispatchQueue = .main,
         execute body: @escaping (Error) -> Void
-        ) -> GeneralPromise
+        ) -> UniversalPromise
     {
         return whenResolved(on: q) {
             if case let .failure(e) = $0.asMiniResult {
@@ -240,10 +240,10 @@ public extension GeneralPromise where Outcome: MiniResultProtocol {
     
     public func recover(
         on q: DispatchQueue = .main,
-        execute body: @escaping (Error) throws -> GeneralPromise
-        ) -> GeneralPromise
+        execute body: @escaping (Error) throws -> UniversalPromise
+        ) -> UniversalPromise
     {
-        let (newPromise, fulfill, reject) = GeneralPromise.pending()
+        let (newPromise, fulfill, reject) = UniversalPromise.pending()
         whenResolved(on: q) {
             switch $0.asMiniResult {
             case let .success(r): fulfill(r)
@@ -258,9 +258,9 @@ public extension GeneralPromise where Outcome: MiniResultProtocol {
     public func recover(
         on q: DispatchQueue = .main,
         execute body: @escaping (Error) throws -> Outcome.Result
-        ) -> GeneralPromise
+        ) -> UniversalPromise
     {
-        let (newPromise, fulfill, reject) = GeneralPromise.pending()
+        let (newPromise, fulfill, reject) = UniversalPromise.pending()
         whenResolved(on: q) {
             switch $0.asMiniResult {
             case let .success(r): fulfill(r)
