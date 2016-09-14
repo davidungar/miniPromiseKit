@@ -70,7 +70,7 @@ public class GeneralPromise<Outcome> {
         -> GeneralPromise
     {
         let p = GeneralPromise()
-        getOutcome(on: q) {
+        whenResolved(on: q) {
             body()
             p.resolve($0)
         }
@@ -78,7 +78,7 @@ public class GeneralPromise<Outcome> {
     }
     
     // When ready, run reader with outcome
-    fileprivate func getOutcome(
+    fileprivate func whenResolved(
         on q: DispatchQueue = .main,
         execute reader: @escaping (Outcome) -> Void
         )
@@ -93,24 +93,25 @@ public class GeneralPromise<Outcome> {
         }
     }
     
-    fileprivate func transformOutcome<NewOutcome>(
+    @discardableResult
+    public func whenResolved<NewOutcome>(
         on q: DispatchQueue = .main,
         execute transformer: @escaping (Outcome) -> NewOutcome
         ) -> GeneralPromise<NewOutcome>
     {
         let p = GeneralPromise<NewOutcome>()
-        getOutcome(on: q) { p.resolve( transformer( $0 ) ) }
+        whenResolved(on: q) { p.resolve( transformer( $0 ) ) }
         return p
     }
     
-    fileprivate func asyncTransformOutcome<NewOutcome>(
+    public func whenResolvedPromise<NewOutcome>(
         on q: DispatchQueue = .main,
         execute asyncTransformer: @escaping (Outcome) -> GeneralPromise<NewOutcome>
         ) -> GeneralPromise<NewOutcome>
     {
         let p = GeneralPromise<NewOutcome>()
-        getOutcome(on: q) {
-            ($0 |> asyncTransformer).getOutcome(on: q) { p.resolve($0) }
+        whenResolved(on: q) {
+            ($0 |> asyncTransformer).whenResolved(on: q) { p.resolve($0) }
         }
         return p
     }
@@ -120,7 +121,7 @@ public class GeneralPromise<Outcome> {
         execute body: @escaping (Outcome) -> Void
         ) -> GeneralPromise
     {
-        return transformOutcome(on: q) {
+        return whenResolved(on: q) {
             body($0)
             return $0
         }
@@ -196,7 +197,7 @@ public extension GeneralPromise where Outcome: MiniResultProtocol {
         execute body: @escaping (Outcome.Result) throws -> NewResult
         ) -> GeneralPromise<MiniResult<NewResult>>
     {
-        return transformOutcome(on: q) {
+        return whenResolved(on: q) {
             outcome -> MiniResult<NewResult> in
             switch outcome.asMiniResult {
             case let .success(r): return {try body(r)} |> MiniResult.catching
@@ -210,11 +211,11 @@ public extension GeneralPromise where Outcome: MiniResultProtocol {
         execute body: @escaping (Outcome.Result) throws -> MiniPromise<NewResult>) -> MiniPromise<NewResult>
     {
         let (p, _, reject) = MiniPromise<NewResult>.pending()
-        getOutcome(on: q) {
+        whenResolved(on: q) {
             outcome in
             switch outcome.asMiniResult {
             case let .success(r):
-                do { try body(r).getOutcome(on: q, execute: p.resolve) }
+                do { try body(r).whenResolved(on: q, execute: p.resolve) }
                 catch { reject(error) }
             case let .failure(e):
                 reject(e)
@@ -229,7 +230,7 @@ public extension GeneralPromise where Outcome: MiniResultProtocol {
         execute body: @escaping (Error) -> Void
         ) -> GeneralPromise
     {
-        return transformOutcome(on: q) {
+        return whenResolved(on: q) {
             if case let .failure(e) = $0.asMiniResult {
                 body(e)
             }
@@ -243,11 +244,11 @@ public extension GeneralPromise where Outcome: MiniResultProtocol {
         ) -> GeneralPromise
     {
         let (newPromise, fulfill, reject) = GeneralPromise.pending()
-        getOutcome(on: q) {
+        whenResolved(on: q) {
             switch $0.asMiniResult {
             case let .success(r): fulfill(r)
             case let .failure(e):
-                do { try body(e).getOutcome(on: q, execute: newPromise.resolve) }
+                do { try body(e).whenResolved(on: q, execute: newPromise.resolve) }
                 catch { reject(error) }
             }
         }
@@ -260,7 +261,7 @@ public extension GeneralPromise where Outcome: MiniResultProtocol {
         ) -> GeneralPromise
     {
         let (newPromise, fulfill, reject) = GeneralPromise.pending()
-        getOutcome(on: q) {
+        whenResolved(on: q) {
             switch $0.asMiniResult {
             case let .success(r): fulfill(r)
             case let .failure(e):

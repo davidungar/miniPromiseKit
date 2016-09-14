@@ -1,7 +1,7 @@
 
 import Foundation
 
-private enum Errors: Error, CustomStringConvertible {
+private enum MiniResultErrors: Error, CustomStringConvertible {
     case alreadyHandled(Error)
     
     public var description: String {
@@ -44,7 +44,7 @@ public enum MiniResult<Result> {
         case .success: return self
         case .failure(let e):
             fn(e)
-            return .failure(Errors.alreadyHandled(e))
+            return .failure(MiniResultErrors.alreadyHandled(e))
         }
     }
     
