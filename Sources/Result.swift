@@ -9,7 +9,7 @@
 import Foundation
 
 
-struct AlreadyHandledError: Error {}
+
 
 public enum Result<FulfilledResult> {
     case fulfilled(FulfilledResult)
@@ -41,7 +41,7 @@ public enum Result<FulfilledResult> {
         case .fulfilled: return self
         case .rejected(let e):
             fn(e)
-            return .rejected(AlreadyHandledError())
+            return .rejected(e)
         }
     }
 }

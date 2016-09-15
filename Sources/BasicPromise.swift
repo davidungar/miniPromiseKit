@@ -23,6 +23,11 @@ public class BasicPromise<Outcome> {
         fn()
     }
     
+    internal static var defaultQ: DispatchQueue {
+        return .main
+            // .global(qos: .userInitiated)
+    }
+    
     public init() {}
     
     public convenience init(resolver: (
@@ -58,7 +63,7 @@ public class BasicPromise<Outcome> {
     }
     
     public func always(
-        on q: DispatchQueue = .main,
+        on q: DispatchQueue  = BasicPromise.defaultQ,
         execute consumer: @escaping (Outcome) -> Void
     )
     {
@@ -75,7 +80,7 @@ public class BasicPromise<Outcome> {
     
     
     public func then<NewOutcome>(
-        on q: DispatchQueue = .main,
+        on q: DispatchQueue  = BasicPromise.defaultQ,
         execute transformer: @escaping (Outcome) -> NewOutcome
         ) -> BasicPromise<NewOutcome>
     {
@@ -85,7 +90,7 @@ public class BasicPromise<Outcome> {
     }
     
     public func then<NewOutcome>(
-        on q: DispatchQueue = .main,
+        on q: DispatchQueue  = BasicPromise.defaultQ,
         execute asyncTransformer: @escaping (Outcome) -> BasicPromise<NewOutcome>
         ) -> BasicPromise<NewOutcome>
     {

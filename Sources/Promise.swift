@@ -82,7 +82,7 @@ public struct Promise<FulfilledResult> {
     
     // FIXME: ToyPromise vs Promise filenames, group names
     public func then<NewFulfilledResult>(
-        on q: DispatchQueue = .main,
+        on q: DispatchQueue  = BasicPromise<Void>.defaultQ,
         execute body: @escaping (FulfilledResult) throws -> NewFulfilledResult
         ) -> Promise<NewFulfilledResult>
     {
@@ -101,7 +101,7 @@ public struct Promise<FulfilledResult> {
     
     
     public func then<NewFulfilledResult>(
-        on q: DispatchQueue = .main,
+        on q: DispatchQueue  = BasicPromise<Void>.defaultQ,
         execute body: @escaping (FulfilledResult) throws -> Promise<NewFulfilledResult>) -> Promise<NewFulfilledResult>
     {
         let (newPromise, fulfill, reject) = Promise<NewFulfilledResult>.pending()
@@ -125,7 +125,7 @@ public struct Promise<FulfilledResult> {
     
     @discardableResult
     public func `catch`(
-        on q: DispatchQueue = .main,
+        on q: DispatchQueue  = BasicPromise<Void>.defaultQ,
         execute body: @escaping (Error) -> Void
         ) -> Promise
     {
@@ -140,7 +140,7 @@ public struct Promise<FulfilledResult> {
     }
     
     public func recover(
-        on q: DispatchQueue = .main,
+        on q: DispatchQueue  = BasicPromise<Void>.defaultQ,
         execute body: @escaping (Error) throws -> Promise
         ) -> Promise
     {
@@ -161,7 +161,7 @@ public struct Promise<FulfilledResult> {
     }
     
     public func recover(
-        on q: DispatchQueue = .main,
+        on q: DispatchQueue  = BasicPromise<Void>.defaultQ,
         execute body: @escaping (Error) throws -> FulfilledResult
         ) -> Promise
     {
@@ -179,7 +179,7 @@ public struct Promise<FulfilledResult> {
     
     
     public func tap(
-        on q: DispatchQueue = .main,
+        on q: DispatchQueue  = BasicPromise<Void>.defaultQ,
         execute body: @escaping (Result<FulfilledResult>) -> Void
         ) -> Promise
     {
@@ -192,7 +192,7 @@ public struct Promise<FulfilledResult> {
     }
     
     public func always(
-        on q: DispatchQueue = .main,
+        on q: DispatchQueue  = BasicPromise<Void>.defaultQ,
         execute body: @escaping () -> Void
         )
         -> Promise
