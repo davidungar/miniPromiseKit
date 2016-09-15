@@ -9,9 +9,9 @@ import Foundation
 
 
 
-public func firstly<FulfilledResult>(
-    execute body: () throws -> Promise<FulfilledResult>
-    ) -> Promise<FulfilledResult>
+public func firstly<FulfilledValue>(
+    execute body: () throws -> Promise<FulfilledValue>
+    ) -> Promise<FulfilledValue>
 {
     do {
         return try body()
@@ -24,11 +24,11 @@ public func firstly<FulfilledResult>(
 // MARK: - members when outcome is result or error. Finagling with protocols to do it.
 
 
-public struct Promise<FulfilledResult> {
-    let basicPromise: BasicPromise< Result< FulfilledResult > >
+public struct Promise<FulfilledValue> {
+    let basicPromise: BasicPromise< Result< FulfilledValue > >
     
     private init(
-        basedOn basis: BasicPromise< Result<FulfilledResult> > = BasicPromise()
+        basedOn basis: BasicPromise< Result<FulfilledValue> > = BasicPromise()
         )
     {
         basicPromise = basis
@@ -36,13 +36,13 @@ public struct Promise<FulfilledResult> {
 
     public  init(
         resolvers: (
-        _ fulfill: @escaping (FulfilledResult ) -> Void,
-        _ reject:  @escaping (Error         ) -> Void
-        )  throws -> Void
+        _ fulfill: @escaping (FulfilledValue ) -> Void,
+        _ reject:  @escaping (Error          ) -> Void
+        ) throws -> Void
         )
     {
         self.init()
-        func fulfillBasic(_ r: Result< FulfilledResult >) {
+        func fulfillBasic(_ r: Result< FulfilledValue >) {
             basicPromise.fulfill(r)
         }
         do {
@@ -56,17 +56,17 @@ public struct Promise<FulfilledResult> {
         }
     }
     
-    public typealias PendingTuple = (promise: Promise, fulfill: (FulfilledResult) -> Void, reject: (Error) -> Void)
+    public typealias PendingTuple = (promise: Promise, fulfill: (FulfilledValue) -> Void, reject: (Error) -> Void)
     
     public static func pending() -> PendingTuple {
-        var fulfill: ((FulfilledResult) -> Void)!
+        var fulfill: ((FulfilledValue) -> Void)!
         var reject:  ((Error) -> Void)!
         let promise = Promise { fulfill = $0; reject = $1 }
         return (promise, fulfill, reject)
     }
     
     
-    public init(value: FulfilledResult) {
+    public init(value: FulfilledValue) {
         self.init {
             fulfill, reject in
             fulfill(value)
@@ -80,23 +80,23 @@ public struct Promise<FulfilledResult> {
     }
     
     // FIXME: ToyPromise vs Promise filenames, group names
-    public func then<NewFulfilledResult>(
+    public func then<NewFulfilledValue>(
         on q: DispatchQueue  = BasicPromise<Void>.defaultQ,
-        execute body: @escaping (FulfilledResult) throws -> NewFulfilledResult
-        ) -> Promise<NewFulfilledResult>
+        execute body: @escaping (FulfilledValue) throws -> NewFulfilledValue
+        ) -> Promise<NewFulfilledValue>
     {
         let newBasicPromise = basicPromise.then(on: q) {
             $0.then(execute: body)
         }
-        return Promise<NewFulfilledResult>(basedOn: newBasicPromise)
+        return Promise<NewFulfilledValue>(basedOn: newBasicPromise)
     }
     
     
-    public func then<NewFulfilledResult>(
+    public func then<NewFulfilledValue>(
         on q: DispatchQueue  = BasicPromise<Void>.defaultQ,
-        execute body: @escaping (FulfilledResult) throws -> Promise<NewFulfilledResult>) -> Promise<NewFulfilledResult>
+        execute body: @escaping (FulfilledValue) throws -> Promise<NewFulfilledValue>) -> Promise<NewFulfilledValue>
     {
-        let (newPromise, fulfill, reject) = Promise<NewFulfilledResult>.pending()
+        let (newPromise, fulfill, reject) = Promise<NewFulfilledValue>.pending()
         _ = basicPromise.then(on: q) {
             $0.then(execute: body)
         }
@@ -111,7 +111,7 @@ public struct Promise<FulfilledResult> {
         ) -> Promise
     {
         let newBasicPromise = basicPromise.then(on: q) {
-            outcome -> Result<FulfilledResult>  in
+            outcome -> Result<FulfilledValue>  in
             outcome.catch     (execute: body)
             return outcome
         }
@@ -141,7 +141,7 @@ public struct Promise<FulfilledResult> {
     
     public func recover(
         on q: DispatchQueue  = BasicPromise<Void>.defaultQ,
-        execute body: @escaping (Error) throws -> FulfilledResult
+        execute body: @escaping (Error) throws -> FulfilledValue
         ) -> Promise
     {
         let (newPromise, fulfill, reject) = Promise.pending()
@@ -157,11 +157,11 @@ public struct Promise<FulfilledResult> {
     
     public func tap(
         on q: DispatchQueue  = BasicPromise<Void>.defaultQ,
-        execute body: @escaping (Result<FulfilledResult>) -> Void
+        execute body: @escaping (Result<FulfilledValue>) -> Void
         ) -> Promise
     {
         let newBasicPromise = basicPromise.then(on: q) {
-            outcome -> Result<FulfilledResult> in
+            outcome -> Result<FulfilledValue> in
             body(outcome)
             return outcome
         }

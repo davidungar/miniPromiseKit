@@ -9,41 +9,46 @@
 import Foundation
 
 
-// TODO: execute:
-
-public enum Result<FulfilledResult> {
-    case fulfilled(FulfilledResult)
+public enum Result<FulfilledValue> {
+    case fulfilled(FulfilledValue)
     case rejected(Error)
     
-    // Fulfilled consumer might fail:
-    @discardableResult // avoid a warning if result is not used
-    public func then<NewFulfilledResult>(execute body: (FulfilledResult) throws -> Result<NewFulfilledResult>) -> Result<NewFulfilledResult> {
+    public init(of body: () throws -> FulfilledValue) {
+        do    { self =  try .fulfilled( body() ) }
+        catch { self =      .rejected ( error) }
+    }
+}
+
+public extension Result {
+    @discardableResult
+    public func then<NewFulfilledValue>( execute body: (FulfilledValue) throws -> NewFulfilledValue )  -> Result<NewFulfilledValue>  {
         switch self {
-            // Because compiler infers types
-            // you don't have to say "return Result<NewFulfilledResult>.rejected(e)" below.
-        case .rejected(let e): return .rejected(e)
+        case .rejected(let e):
+            return .rejected(e)
         case .fulfilled(let r):
-            do    { return try body(r) }
+            do    { return try .fulfilled( body(r) ) }
             catch { return .rejected( error ) }
         }
     }
-    
-    // Fulfilled consumer always succeeds:
-    @discardableResult // avoid a warning if result is not used
-    public func then<NewFulfilledResult>( execute body: (FulfilledResult) throws -> NewFulfilledResult )  -> Result<NewFulfilledResult>  {
-        return then { try .fulfilled( body($0) ) }
-    }
-    
-    @discardableResult // avoid a warning if result is not used
+}
+
+public extension Result {
+    @discardableResult
     public func `catch`( execute body: (Error) -> Void) -> Result {
-        return recover {
-            body($0)
-            throw $0
-         }
+        switch self {
+        case .fulfilled:
+            break
+        case .rejected(let e):
+            body(e)
+        }
+        return self
     }
-    
+}
+
+public extension Result { // not for book
+
     @discardableResult // avoid a warning if result is not used
-    public func recover(execute body: (Error) throws -> FulfilledResult) -> Result {
+    public func recover(execute body: (Error) throws -> FulfilledValue) -> Result {
         switch self {
         case .fulfilled: return self
         case .rejected(let e):
