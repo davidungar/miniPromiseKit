@@ -7,10 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BC5E0B381D89E88C00EC53A2 /* BasicPromise.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5E0B371D89E88C00EC53A2 /* BasicPromise.swift */; };
+		BC5E0B3A1D89E8BF00EC53A2 /* ResultOrError.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5E0B391D89E8BF00EC53A2 /* ResultOrError.swift */; };
 		_LinkFileRef_MiniPromiseKit_via_MiniPromiseKitTests /* MiniPromiseKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_MiniPromiseKit" /* MiniPromiseKit.framework */; };
 		__src_cc_ref_Sources/Apply.swift /* Apply.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/Apply.swift /* Apply.swift */; };
-		__src_cc_ref_Sources/MiniPromiseKit.swift /* MiniPromiseKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/MiniPromiseKit.swift /* MiniPromiseKit.swift */; };
-		__src_cc_ref_Sources/Result.swift /* MiniResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/Result.swift /* MiniResult.swift */; };
+		__src_cc_ref_Sources/MiniPromiseKit.swift /* Promise.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/MiniPromiseKit.swift /* Promise.swift */; };
 		__src_cc_ref_Tests/MiniPromiseKitTests/MiniPromiseKitTests.swift /* MiniPromiseKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Tests/MiniPromiseKitTests/MiniPromiseKitTests.swift /* MiniPromiseKitTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -25,11 +26,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		BC5E0B371D89E88C00EC53A2 /* BasicPromise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BasicPromise.swift; sourceTree = "<group>"; };
+		BC5E0B391D89E8BF00EC53A2 /* ResultOrError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ResultOrError.swift; path = ../../PlaygroundsAreBusted/ResultOrError.swift; sourceTree = "<group>"; };
 		__PBXFileRef_MiniPromiseKit.xcodeproj/Configs/Project.xcconfig /* MiniPromiseKit.xcodeproj/Configs/Project.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = MiniPromiseKit.xcodeproj/Configs/Project.xcconfig; sourceTree = "<group>"; };
 		__PBXFileRef_Package.swift /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		__PBXFileRef_Sources/Apply.swift /* Apply.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Apply.swift; sourceTree = "<group>"; };
-		__PBXFileRef_Sources/MiniPromiseKit.swift /* MiniPromiseKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniPromiseKit.swift; sourceTree = "<group>"; };
-		__PBXFileRef_Sources/Result.swift /* MiniResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniResult.swift; sourceTree = "<group>"; };
+		__PBXFileRef_Sources/MiniPromiseKit.swift /* Promise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Promise.swift; sourceTree = "<group>"; };
 		__PBXFileRef_Tests/MiniPromiseKitTests/MiniPromiseKitTests.swift /* MiniPromiseKitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniPromiseKitTests.swift; sourceTree = "<group>"; };
 		"_____Product_MiniPromiseKit" /* MiniPromiseKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = MiniPromiseKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"_____Product_MiniPromiseKitTests" /* MiniPromiseKitTests.xctest */ = {isa = PBXFileReference; lastKnownFileType = file; path = MiniPromiseKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -101,9 +103,10 @@
 		"_______Group_MiniPromiseKit" /* MiniPromiseKit */ = {
 			isa = PBXGroup;
 			children = (
+				BC5E0B391D89E8BF00EC53A2 /* ResultOrError.swift */,
+				BC5E0B371D89E88C00EC53A2 /* BasicPromise.swift */,
 				__PBXFileRef_Sources/Apply.swift /* Apply.swift */,
-				__PBXFileRef_Sources/MiniPromiseKit.swift /* MiniPromiseKit.swift */,
-				__PBXFileRef_Sources/Result.swift /* MiniResult.swift */,
+				__PBXFileRef_Sources/MiniPromiseKit.swift /* Promise.swift */,
 			);
 			name = MiniPromiseKit;
 			path = Sources;
@@ -194,8 +197,9 @@
 			buildActionMask = 0;
 			files = (
 				__src_cc_ref_Sources/Apply.swift /* Apply.swift in Sources */,
-				__src_cc_ref_Sources/MiniPromiseKit.swift /* MiniPromiseKit.swift in Sources */,
-				__src_cc_ref_Sources/Result.swift /* MiniResult.swift in Sources */,
+				BC5E0B3A1D89E8BF00EC53A2 /* ResultOrError.swift in Sources */,
+				__src_cc_ref_Sources/MiniPromiseKit.swift /* Promise.swift in Sources */,
+				BC5E0B381D89E88C00EC53A2 /* BasicPromise.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
