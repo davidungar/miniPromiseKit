@@ -11,37 +11,37 @@ import Foundation
 
 struct AlreadyHandledError: Error {}
 
-public enum Result<SuccessResult> {
-    case failure(Error)
-    case success(SuccessResult)
+public enum Result<FulfilledResult> {
+    case fulfilled(FulfilledResult)
+    case rejected(Error)
     
-    // Success consumer might fail:
+    // Fulfilled consumer might fail:
     @discardableResult // avoid a warning if result is not used
-    public func ifSuccess<NewSuccessResult>(_ fn: (SuccessResult) -> Result<NewSuccessResult>) -> Result<NewSuccessResult> {
+    public func ifFulfilled<NewFulfilledResult>(_ fn: (FulfilledResult) -> Result<NewFulfilledResult>) -> Result<NewFulfilledResult> {
         switch self {
             // Because compiler infers types
-            // you don't have to say "return Result<NewSuccessResult>.failure(e)" below.
-        case .failure(let e): return .failure(e)
-        case .success(let r): return fn(r)
+            // you don't have to say "return Result<NewFulfilledResult>.rejected(e)" below.
+        case .rejected(let e): return .rejected(e)
+        case .fulfilled(let r): return fn(r)
         }
     }
     
-    // Success consumer always succeeds:
+    // Fulfilled consumer always succeeds:
     @discardableResult // avoid a warning if result is not used
-    public func ifSuccess<NewSuccessResult>( _ fn: (SuccessResult) -> NewSuccessResult )  -> Result<NewSuccessResult>  {
+    public func ifFulfilled<NewFulfilledResult>( _ fn: (FulfilledResult) -> NewFulfilledResult )  -> Result<NewFulfilledResult>  {
         switch self {
-        case .failure(let e): return .failure(e)
-        case .success(let r): return Result<NewSuccessResult>.success( fn(r) )
+        case .rejected(let e): return .rejected(e)
+        case .fulfilled(let r): return Result<NewFulfilledResult>.fulfilled( fn(r) )
         }
     }
     
     @discardableResult // avoid a warning if result is not used
-    public func ifFailure(_ fn: (Error) -> Void) -> Result {
+    public func ifRejected(_ fn: (Error) -> Void) -> Result {
         switch self {
-        case .success: return self
-        case .failure(let e):
+        case .fulfilled: return self
+        case .rejected(let e):
             fn(e)
-            return .failure(AlreadyHandledError())
+            return .rejected(AlreadyHandledError())
         }
     }
 }
