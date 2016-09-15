@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		BC5E0B381D89E88C00EC53A2 /* BasicPromise.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5E0B371D89E88C00EC53A2 /* BasicPromise.swift */; };
-		BC5E0B451D8A3AF800EC53A2 /* ResultOrError.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5E0B441D8A3AF800EC53A2 /* ResultOrError.swift */; };
+		BC5E0B451D8A3AF800EC53A2 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5E0B441D8A3AF800EC53A2 /* Result.swift */; };
 		_LinkFileRef_MiniPromiseKit_via_MiniPromiseKitTests /* MiniPromiseKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "_____Product_MiniPromiseKit" /* MiniPromiseKit.framework */; };
 		__src_cc_ref_Sources/Apply.swift /* Apply.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/Apply.swift /* Apply.swift */; };
 		__src_cc_ref_Sources/MiniPromiseKit.swift /* Promise.swift in Sources */ = {isa = PBXBuildFile; fileRef = __PBXFileRef_Sources/MiniPromiseKit.swift /* Promise.swift */; };
@@ -27,7 +27,7 @@
 
 /* Begin PBXFileReference section */
 		BC5E0B371D89E88C00EC53A2 /* BasicPromise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BasicPromise.swift; sourceTree = "<group>"; };
-		BC5E0B441D8A3AF800EC53A2 /* ResultOrError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResultOrError.swift; sourceTree = "<group>"; };
+		BC5E0B441D8A3AF800EC53A2 /* Result.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
 		__PBXFileRef_MiniPromiseKit.xcodeproj/Configs/Project.xcconfig /* MiniPromiseKit.xcodeproj/Configs/Project.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = MiniPromiseKit.xcodeproj/Configs/Project.xcconfig; sourceTree = "<group>"; };
 		__PBXFileRef_Package.swift /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		__PBXFileRef_Sources/Apply.swift /* Apply.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Apply.swift; sourceTree = "<group>"; };
@@ -103,7 +103,7 @@
 		"_______Group_MiniPromiseKit" /* MiniPromiseKit */ = {
 			isa = PBXGroup;
 			children = (
-				BC5E0B441D8A3AF800EC53A2 /* ResultOrError.swift */,
+				BC5E0B441D8A3AF800EC53A2 /* Result.swift */,
 				BC5E0B371D89E88C00EC53A2 /* BasicPromise.swift */,
 				__PBXFileRef_Sources/Apply.swift /* Apply.swift */,
 				__PBXFileRef_Sources/MiniPromiseKit.swift /* Promise.swift */,
@@ -197,7 +197,7 @@
 			buildActionMask = 0;
 			files = (
 				__src_cc_ref_Sources/Apply.swift /* Apply.swift in Sources */,
-				BC5E0B451D8A3AF800EC53A2 /* ResultOrError.swift in Sources */,
+				BC5E0B451D8A3AF800EC53A2 /* Result.swift in Sources */,
 				__src_cc_ref_Sources/MiniPromiseKit.swift /* Promise.swift in Sources */,
 				BC5E0B381D89E88C00EC53A2 /* BasicPromise.swift in Sources */,
 			);
