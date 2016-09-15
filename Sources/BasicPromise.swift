@@ -11,9 +11,9 @@ import Foundation
 // A BasicPromise handles any type of Outcome, and doesn't care about errors.
 
 public class BasicPromise<Outcome> {
-    private typealias Reader = (Outcome) -> Void
+    private typealias Consumer = (Outcome) -> Void
     private var outcomeIfKnown: Outcome?
-    private var readerIfKnown: Reader?
+    private var consumerAndQueueIfKnown: (consumer: Consumer, q: DispatchQueue)?
     
     
     private let racePrevention = DispatchSemaphore(value: 1)
@@ -41,12 +41,14 @@ public class BasicPromise<Outcome> {
     }
     
     
-    public func fulfill(_ outcome: Outcome) -> Void {
+    public func fulfill(
+        _ outcome: Outcome
+        ) -> Void
+    {
         oneAtATime {
-            if let reader = self.readerIfKnown {
-                DispatchQueue(label: "BasicPromise reader", qos: .userInitiated)
-                    .async {
-                        reader(outcome)
+            if let (consumer, q) = self.consumerAndQueueIfKnown {
+                q.async {
+                    consumer(outcome)
                 }
             }
             else {
@@ -55,8 +57,22 @@ public class BasicPromise<Outcome> {
         }
     }
     
+    public func always(
+        on q: DispatchQueue = .main,
+        execute consumer: @escaping (Outcome) -> Void
+    )
+    {
+        oneAtATime {
+            if let outcome = outcomeIfKnown {
+                q.async { consumer(outcome) }
+            }
+            else {
+                self.consumerAndQueueIfKnown = (consumer, q)
+            }
+        }
+    }
     
-    // When ready, run reader with outcome
+    
     
     public func then<NewOutcome>(
         on q: DispatchQueue = .main,
@@ -64,7 +80,7 @@ public class BasicPromise<Outcome> {
         ) -> BasicPromise<NewOutcome>
     {
         let p = BasicPromise<NewOutcome>()
-        _ = then(on: q) { p.fulfill( transformer( $0 ) ) }
+        _ = always(on: q) { p.fulfill( transformer( $0 ) ) }
         return p
     }
     
@@ -74,8 +90,9 @@ public class BasicPromise<Outcome> {
         ) -> BasicPromise<NewOutcome>
     {
         let p = BasicPromise<NewOutcome>()
-        _ = then(on: q) {
-            ($0 |> asyncTransformer).then(on: q) { p.fulfill($0) }
+        always(on: q) {
+            asyncTransformer($0)
+                .always(on: q) { p.fulfill($0) }
         }
         return p
     }

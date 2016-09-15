@@ -8,6 +8,8 @@
 
 import Foundation
 
+// FIXME: rename to Result, use PromiseKit names
+
 struct AlreadyHandledError: Error {}
 
 public enum ResultOrError<SuccessResult> {
