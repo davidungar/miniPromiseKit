@@ -26,10 +26,10 @@ public func firstly<SuccessResult>(
 
 
 public struct Promise<SuccessResult> {
-    let basicPromise: BasicPromise< ResultOrError< SuccessResult > >
+    let basicPromise: BasicPromise< Result< SuccessResult > >
     
     private init(
-        basedOn basis: BasicPromise< ResultOrError<SuccessResult> > = BasicPromise()
+        basedOn basis: BasicPromise< Result<SuccessResult> > = BasicPromise()
         )
     {
         basicPromise = basis
@@ -43,7 +43,7 @@ public struct Promise<SuccessResult> {
         )
     {
         self.init()
-        func fulfillBasic(_ r: ResultOrError< SuccessResult >) {
+        func fulfillBasic(_ r: Result< SuccessResult >) {
             basicPromise.fulfill(r)
         }
         do {
@@ -87,7 +87,7 @@ public struct Promise<SuccessResult> {
         ) -> Promise<NewSuccessResult>
     {
         let newBasicPromise = basicPromise.then(on: q) {
-            outcome -> ResultOrError<NewSuccessResult> in
+            outcome -> Result<NewSuccessResult> in
             switch outcome {
             case let .failure(e):
                 return .failure(e)
@@ -130,7 +130,7 @@ public struct Promise<SuccessResult> {
         ) -> Promise
     {
         let newBasicPromise = basicPromise.then(on: q) {
-            outcome -> ResultOrError<SuccessResult>  in
+            outcome -> Result<SuccessResult>  in
             if case let .failure(e) = outcome {
                 body(e)
             }
@@ -180,11 +180,11 @@ public struct Promise<SuccessResult> {
     
     public func tap(
         on q: DispatchQueue = .main,
-        execute body: @escaping (ResultOrError<SuccessResult>) -> Void
+        execute body: @escaping (Result<SuccessResult>) -> Void
         ) -> Promise
     {
         let newBasicPromise = basicPromise.then(on: q) {
-            outcome -> ResultOrError<SuccessResult> in
+            outcome -> Result<SuccessResult> in
             body(outcome)
             return outcome
         }

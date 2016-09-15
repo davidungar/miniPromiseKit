@@ -1,5 +1,5 @@
 //
-//  ResultOrError.swift
+//  Result.swift
 //  PlaygroundsAreBusted
 //
 //  Created by David Ungar on 8/22/16.
@@ -8,20 +8,19 @@
 
 import Foundation
 
-// FIXME: rename to Result, use PromiseKit names
 
 struct AlreadyHandledError: Error {}
 
-public enum ResultOrError<SuccessResult> {
+public enum Result<SuccessResult> {
     case failure(Error)
     case success(SuccessResult)
     
     // Success consumer might fail:
     @discardableResult // avoid a warning if result is not used
-    public func ifSuccess<NewSuccessResult>(_ fn: (SuccessResult) -> ResultOrError<NewSuccessResult>) -> ResultOrError<NewSuccessResult> {
+    public func ifSuccess<NewSuccessResult>(_ fn: (SuccessResult) -> Result<NewSuccessResult>) -> Result<NewSuccessResult> {
         switch self {
             // Because compiler infers types
-            // you don't have to say "return ResultOrError<NewSuccessResult>.failure(e)" below.
+            // you don't have to say "return Result<NewSuccessResult>.failure(e)" below.
         case .failure(let e): return .failure(e)
         case .success(let r): return fn(r)
         }
@@ -29,15 +28,15 @@ public enum ResultOrError<SuccessResult> {
     
     // Success consumer always succeeds:
     @discardableResult // avoid a warning if result is not used
-    public func ifSuccess<NewSuccessResult>( _ fn: (SuccessResult) -> NewSuccessResult )  -> ResultOrError<NewSuccessResult>  {
+    public func ifSuccess<NewSuccessResult>( _ fn: (SuccessResult) -> NewSuccessResult )  -> Result<NewSuccessResult>  {
         switch self {
         case .failure(let e): return .failure(e)
-        case .success(let r): return ResultOrError<NewSuccessResult>.success( fn(r) )
+        case .success(let r): return Result<NewSuccessResult>.success( fn(r) )
         }
     }
     
     @discardableResult // avoid a warning if result is not used
-    public func ifFailure(_ fn: (Error) -> Void) -> ResultOrError {
+    public func ifFailure(_ fn: (Error) -> Void) -> Result {
         switch self {
         case .success: return self
         case .failure(let e):
