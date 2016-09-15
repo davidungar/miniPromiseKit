@@ -21,7 +21,6 @@ public func firstly<FulfilledResult>(
 }
 
 
-
 // MARK: - members when outcome is result or error. Finagling with protocols to do it.
 
 
@@ -87,14 +86,7 @@ public struct Promise<FulfilledResult> {
         ) -> Promise<NewFulfilledResult>
     {
         let newBasicPromise = basicPromise.then(on: q) {
-            outcome -> Result<NewFulfilledResult> in
-            switch outcome {
-            case let .rejected(e):
-                return .rejected(e)
-            case let .fulfilled(r):
-                do    { return .fulfilled( try body(r) ) }
-                catch { return .rejected( error )       }
-            }
+            $0.then(execute: body)
         }
         return Promise<NewFulfilledResult>(basedOn: newBasicPromise)
     }
@@ -106,18 +98,7 @@ public struct Promise<FulfilledResult> {
     {
         let (newPromise, fulfill, reject) = Promise<NewFulfilledResult>.pending()
         _ = basicPromise.then(on: q) {
-            outcome  -> Void in
-            switch outcome {
-            case let .rejected(e):
-                reject(e)
-            case let .fulfilled(r):
-                do {
-                    try body(r)
-                        .then (execute: fulfill)
-                        .catch(execute: reject)
-                }
-                catch { reject(error) }
-            }
+            $0.then(execute: body)
         }
         return newPromise
     }
@@ -131,9 +112,7 @@ public struct Promise<FulfilledResult> {
     {
         let newBasicPromise = basicPromise.then(on: q) {
             outcome -> Result<FulfilledResult>  in
-            if case let .rejected(e) = outcome {
-                body(e)
-            }
+            outcome.catch     (execute: body)
             return outcome
         }
         return Promise(basedOn: newBasicPromise)
@@ -167,12 +146,10 @@ public struct Promise<FulfilledResult> {
     {
         let (newPromise, fulfill, reject) = Promise.pending()
         _ = basicPromise.then(on: q) {
-            switch $0 {
-            case let .fulfilled(r): fulfill(r)
-            case let .rejected(e):
-                do    { try fulfill( body(e) ) }
-                catch {     reject(  error )   }
-            }
+            $0
+                .recover(execute: body)
+                .then( execute: fulfill )
+                .catch      ( execute: reject  )
         }
         return newPromise
     }
