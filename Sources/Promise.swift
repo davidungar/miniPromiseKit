@@ -25,7 +25,7 @@ public func firstly<FulfilledValue>(
 
 
 public struct Promise<FulfilledValue> {
-    let basicPromise: BasicPromise< Result< FulfilledValue > >
+    fileprivate let basicPromise: BasicPromise< Result< FulfilledValue > >
     
     private init(
         basedOn basis: BasicPromise< Result<FulfilledValue> > = BasicPromise()
@@ -79,7 +79,6 @@ public struct Promise<FulfilledValue> {
         }
     }
     
-    // FIXME: ToyPromise vs Promise filenames, group names
     public func then<NewFulfilledValue>(
         on q: DispatchQueue  = BasicPromise<Void>.defaultQ,
         execute body: @escaping (FulfilledValue) throws -> NewFulfilledValue
@@ -94,16 +93,24 @@ public struct Promise<FulfilledValue> {
     
     public func then<NewFulfilledValue>(
         on q: DispatchQueue  = BasicPromise<Void>.defaultQ,
-        execute body: @escaping (FulfilledValue) throws -> Promise<NewFulfilledValue>) -> Promise<NewFulfilledValue>
+        execute body: @escaping (FulfilledValue) throws -> Promise<NewFulfilledValue>
+        ) -> Promise<NewFulfilledValue>
     {
-        let (newPromise, fulfill, reject) = Promise<NewFulfilledValue>.pending()
-        _ = basicPromise.then(on: q) {
-            $0.then(execute: body)
+        return Promise<NewFulfilledValue> {
+            fulfill, reject in
+            _ = basicPromise.then {  // calling the "then" with a null body
+                result -> Void in
+                _ = result
+                    .catch { (e: Error) -> Void in reject(e) }
+                    .then  {
+                        do    { try body($0).then(execute: fulfill).catch(execute: reject) }
+                        catch { reject(error) }
+                    }
+            }
         }
-        return newPromise
     }
-    
-    
+
+
     @discardableResult
     public func `catch`(
         on q: DispatchQueue  = BasicPromise<Void>.defaultQ,
