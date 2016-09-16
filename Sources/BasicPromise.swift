@@ -30,25 +30,9 @@ public class BasicPromise<Outcome> {
     
     public init() {}
     
-    public convenience init(resolver: (
-        _ fulfill: @escaping (Outcome) -> Void
-        ) -> Void) {
-        self.init()
-        resolver(fulfill)
-    }
-    
-    // TODO change init? ala Prom
-    
-    public convenience init(outcome: Outcome) {
-        self.init { fulfill in
-            fulfill(outcome)
-        }
-    }
     
     
-    public func fulfill(
-        _ outcome: Outcome
-        ) -> Void
+    public func fulfill(_ outcome: Outcome) -> Void
     {
         oneAtATime {
             if let (consumer, q) = self.consumerAndQueueIfKnown {
@@ -62,8 +46,8 @@ public class BasicPromise<Outcome> {
         }
     }
     
-    public func always(
-        on q: DispatchQueue  = BasicPromise.defaultQ,
+    public func then(
+        on q: DispatchQueue = BasicPromise.defaultQ,
         execute consumer: @escaping (Outcome) -> Void
     )
     {
@@ -80,24 +64,24 @@ public class BasicPromise<Outcome> {
     
     
     public func then<NewOutcome>(
-        on q: DispatchQueue  = BasicPromise.defaultQ,
+        on q: DispatchQueue = BasicPromise.defaultQ,
         execute transformer: @escaping (Outcome) -> NewOutcome
         ) -> BasicPromise<NewOutcome>
     {
         let p = BasicPromise<NewOutcome>()
-        _ = always(on: q) { p.fulfill( transformer( $0 ) ) }
+        then(on: q) { p.fulfill( transformer( $0 ) ) }
         return p
     }
     
     public func then<NewOutcome>(
-        on q: DispatchQueue  = BasicPromise.defaultQ,
+        on q: DispatchQueue = BasicPromise.defaultQ,
         execute asyncTransformer: @escaping (Outcome) -> BasicPromise<NewOutcome>
         ) -> BasicPromise<NewOutcome>
     {
         let p = BasicPromise<NewOutcome>()
-        always(on: q) {
+        then(on: q) {
             asyncTransformer($0)
-                .always(on: q) { p.fulfill($0) }
+                .then(on: q) { p.fulfill($0) }
         }
         return p
     }
