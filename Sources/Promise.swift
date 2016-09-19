@@ -26,8 +26,10 @@ public func firstly<FulfilledValue>(
 
 public struct Promise<FulfilledValue> {
     fileprivate let basicPromise: BasicPromise< Result< FulfilledValue > >
-    
-    private init(
+}
+
+public extension Promise {
+    fileprivate init(
         basedOn basis: BasicPromise< Result<FulfilledValue> > = BasicPromise()
         )
     {
@@ -55,6 +57,9 @@ public struct Promise<FulfilledValue> {
             fulfillBasic(.rejected(error))
         }
     }
+}
+
+public extension Promise {
     
     public typealias PendingTuple = (promise: Promise, fulfill: (FulfilledValue) -> Void, reject: (Error) -> Void)
     
@@ -66,6 +71,9 @@ public struct Promise<FulfilledValue> {
     }
     
     
+}
+
+public extension Promise {
     public init(value: FulfilledValue) {
         self.init {
             fulfill, reject in
@@ -79,6 +87,9 @@ public struct Promise<FulfilledValue> {
         }
     }
     
+}
+
+public extension Promise {
     public func then<NewFulfilledValue>(
         on q: DispatchQueue  = BasicPromise<Void>.defaultQ,
         execute body: @escaping (FulfilledValue) throws -> NewFulfilledValue
