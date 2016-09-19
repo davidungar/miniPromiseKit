@@ -13,7 +13,7 @@
 
 import Foundation
 
-// A BasicPromise handles any type of Outcome, and doesn't care about errors.
+// A BasicPromise handles any type of Outcome, and doesn't help deal with about errors.
 
 public class BasicPromise<Outcome> {
     private typealias Consumer = (Outcome) -> Void
@@ -51,6 +51,7 @@ public class BasicPromise<Outcome> {
         }
     }
     
+    
     public func then(
         on q: DispatchQueue = BasicPromise.defaultQ,
         execute consumer: @escaping (Outcome) -> Void
@@ -67,7 +68,6 @@ public class BasicPromise<Outcome> {
     }
     
     
-    
     public func then<NewOutcome>(
         on q: DispatchQueue = BasicPromise.defaultQ,
         execute transformer: @escaping (Outcome) -> NewOutcome
@@ -77,6 +77,7 @@ public class BasicPromise<Outcome> {
         then(on: q) { p.fulfill( transformer( $0 ) ) }
         return p
     }
+    
     
     public func then<NewOutcome>(
         on q: DispatchQueue = BasicPromise.defaultQ,

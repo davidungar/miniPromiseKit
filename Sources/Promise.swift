@@ -25,12 +25,15 @@ public func firstly<FulfilledValue>(
 }
 
 
-// MARK: - members when outcome is result or error. Finagling with protocols to do it.
+// The somewhat odd division into extensions has been performed in order to serve
+// the purposes of the book.
+
 
 
 public struct Promise<FulfilledValue> {
     fileprivate let basicPromise: BasicPromise< Result< FulfilledValue > >
 }
+
 
 public extension Promise {
     fileprivate init(
@@ -63,6 +66,7 @@ public extension Promise {
     }
 }
 
+
 public extension Promise {
     
     public typealias PendingTuple = (promise: Promise, fulfill: (FulfilledValue) -> Void, reject: (Error) -> Void)
@@ -73,9 +77,8 @@ public extension Promise {
         let promise = Promise { fulfill = $0; reject = $1 }
         return (promise, fulfill, reject)
     }
-    
-    
 }
+
 
 public extension Promise {
     public init(value: FulfilledValue) {
@@ -93,7 +96,9 @@ public extension Promise {
     
 }
 
+
 public extension Promise {
+    
     public func then<NewFulfilledValue>(
         on q: DispatchQueue  = BasicPromise<Void>.defaultQ,
         execute body: @escaping (FulfilledValue) throws -> NewFulfilledValue
@@ -198,6 +203,5 @@ public extension Promise {
     {
         return tap(on: q) { _ in body() }
     }
-
 }
 

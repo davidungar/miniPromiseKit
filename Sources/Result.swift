@@ -50,8 +50,8 @@ public extension Result {
     }
 }
 
-public extension Result { // not for book
 
+public extension Result { // not for book
     @discardableResult // avoid a warning if result is not used
     public func recover(execute body: (Error) throws -> FulfilledValue) -> Result {
         switch self {
@@ -76,8 +76,6 @@ public extension Result { // not for book
         body()
         return self
     }
-
-
 }
 
 

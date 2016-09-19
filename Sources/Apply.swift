@@ -19,10 +19,8 @@ precedencegroup LeftFunctionalApply {
     lowerThan: TernaryPrecedence
 }
 
-// pipe val into monadic fn
 infix operator |> : LeftFunctionalApply
 
-// pipe val into monadic fn
 internal func |>  <A, B> ( x: A, f: (A) throws -> B ) rethrows  -> B {
     return try f(x)
 }
