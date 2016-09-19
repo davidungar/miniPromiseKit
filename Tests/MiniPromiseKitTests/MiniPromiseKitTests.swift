@@ -14,17 +14,38 @@
 import XCTest
 @testable import MiniPromiseKit
 
+let queue = DispatchQueue(label: "com.example.todolist")
+
+func echoPromise(message: String) -> Promise<String> {
+    return Promise { fulfill, reject in
+        queue.async {
+            fulfill("Echo: \(message)")
+        }
+    }
+}
+
 class MiniPromiseKitTests: XCTestCase {
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        XCTAssertEqual(MiniPromiseKit().text, "Hello, World!")
+    
+    func testBasic() {
+        
+        let expectation1 = expectation(description: "Get all the user feeds")
+        
+        _ = firstly {
+            echoPromise(message: "Awesome")
+            }
+        .then { returnedMessage in
+            XCTAssertEqual(returnedMessage, "Echo: Awesome")
+            expectation1.fulfill()
+        }
+        
+        waitForExpectations(timeout: 5, handler: { _ in  })
+        
     }
 
 
     static var allTests : [(String, (MiniPromiseKitTests) -> () throws -> Void)] {
         return [
-            ("testExample", testExample),
+            ("testBasic", testBasic),
         ]
     }
 }
