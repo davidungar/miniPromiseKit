@@ -15,6 +15,8 @@ import Foundation
 
 // A BasicPromise handles any type of Outcome, and doesn't help deal with about errors.
 
+private var defaultQ: DispatchQueue = .main
+
 public class BasicPromise<Outcome> {
     private typealias Consumer = (Outcome) -> Void
     private var outcomeIfKnown: Outcome?
@@ -28,9 +30,9 @@ public class BasicPromise<Outcome> {
         fn()
     }
     
-    internal static var defaultQ: DispatchQueue {
-        return .main
-            // .global(qos: .userInitiated)
+    internal static var defaultQueue: DispatchQueue {
+        get { return defaultQ }
+        set { defaultQ = newValue }
     }
     
     public init() {}
@@ -53,7 +55,7 @@ public class BasicPromise<Outcome> {
     
     
     public func then(
-        on q: DispatchQueue = BasicPromise.defaultQ,
+        on q: DispatchQueue = BasicPromise.defaultQueue,
         execute consumer: @escaping (Outcome) -> Void
     )
     {
@@ -69,7 +71,7 @@ public class BasicPromise<Outcome> {
     
     
     public func then<NewOutcome>(
-        on q: DispatchQueue = BasicPromise.defaultQ,
+        on q: DispatchQueue = BasicPromise.defaultQueue,
         execute transformer: @escaping (Outcome) -> NewOutcome
         ) -> BasicPromise<NewOutcome>
     {
@@ -80,7 +82,7 @@ public class BasicPromise<Outcome> {
     
     
     public func then<NewOutcome>(
-        on q: DispatchQueue = BasicPromise.defaultQ,
+        on q: DispatchQueue = BasicPromise.defaultQueue,
         execute asyncTransformer: @escaping (Outcome) -> BasicPromise<NewOutcome>
         ) -> BasicPromise<NewOutcome>
     {

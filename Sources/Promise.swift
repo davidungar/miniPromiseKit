@@ -100,7 +100,7 @@ public extension Promise {
 public extension Promise {
     
     public func then<NewFulfilledValue>(
-        on q: DispatchQueue  = BasicPromise<Void>.defaultQ,
+        on q: DispatchQueue  = BasicPromise<Void>.defaultQueue,
         execute body: @escaping (FulfilledValue) throws -> NewFulfilledValue
         ) -> Promise<NewFulfilledValue>
     {
@@ -112,18 +112,22 @@ public extension Promise {
     
     
     public func then<NewFulfilledValue>(
-        on q: DispatchQueue  = BasicPromise<Void>.defaultQ,
+        on q: DispatchQueue  = BasicPromise<Void>.defaultQueue,
         execute body: @escaping (FulfilledValue) throws -> Promise<NewFulfilledValue>
         ) -> Promise<NewFulfilledValue>
     {
         return Promise<NewFulfilledValue> {
             fulfill, reject in
-            _ = basicPromise.then {  // calling the "then" with a null body
+            _ = basicPromise.then(on: q) {  // calling the "then" with a null body
                 result -> Void in
                 _ = result
                     .catch { (e: Error) -> Void in reject(e) }
                     .then  {
-                        do    { try body($0).then(execute: fulfill).catch(execute: reject) }
+                        do    {
+                            try body($0)
+                                .then( on: q, execute: fulfill)
+                                .catch(on: q, execute: reject )
+                        }
                         catch { reject(error) }
                     }
             }
@@ -133,20 +137,20 @@ public extension Promise {
 
     @discardableResult
     public func `catch`(
-        on q: DispatchQueue  = BasicPromise<Void>.defaultQ,
+        on q: DispatchQueue  = BasicPromise<Void>.defaultQueue,
         execute body: @escaping (Error) -> Void
         ) -> Promise
     {
         let newBasicPromise = basicPromise.then(on: q) {
             outcome -> Result<FulfilledValue>  in
-            outcome.catch     (execute: body)
+            outcome.catch(execute: body)
             return outcome
         }
         return Promise(basedOn: newBasicPromise)
     }
     
     public func recover(
-        on q: DispatchQueue  = BasicPromise<Void>.defaultQ,
+        on q: DispatchQueue  = BasicPromise<Void>.defaultQueue,
         execute body: @escaping (Error) throws -> Promise
         ) -> Promise
     {
@@ -167,23 +171,23 @@ public extension Promise {
     }
     
     public func recover(
-        on q: DispatchQueue  = BasicPromise<Void>.defaultQ,
+        on q: DispatchQueue  = BasicPromise<Void>.defaultQueue,
         execute body: @escaping (Error) throws -> FulfilledValue
         ) -> Promise
     {
         let (newPromise, fulfill, reject) = Promise.pending()
         _ = basicPromise.then(on: q) {
             $0
-                .recover(execute: body)
-                .then( execute: fulfill )
-                .catch      ( execute: reject  )
+                .recover( execute: body    )
+                .then   ( execute: fulfill )
+                .catch  ( execute: reject  )
         }
         return newPromise
     }
     
     
     public func tap(
-        on q: DispatchQueue  = BasicPromise<Void>.defaultQ,
+        on q: DispatchQueue  = BasicPromise<Void>.defaultQueue,
         execute body: @escaping (Result<FulfilledValue>) -> Void
         ) -> Promise
     {
@@ -196,7 +200,7 @@ public extension Promise {
     }
     
     public func always(
-        on q: DispatchQueue  = BasicPromise<Void>.defaultQ,
+        on q: DispatchQueue  = BasicPromise<Void>.defaultQueue,
         execute body: @escaping () -> Void
         )
         -> Promise
