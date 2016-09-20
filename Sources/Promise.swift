@@ -25,9 +25,6 @@ public func firstly<FulfilledValue>(
 }
 
 
-// The somewhat odd division into extensions has been performed in order to serve
-// the purposes of the book.
-
 
 
 public struct Promise<FulfilledValue> {
@@ -42,6 +39,8 @@ public extension Promise {
     {
         basicPromise = basis
     }
+    
+    // Following PromiseKit's convention, the public initializer and static method also supply the fulfill and reject routines for the created Promise:
 
     public  init(
         resolvers: (
@@ -64,10 +63,6 @@ public extension Promise {
             fulfillBasic(.rejected(error))
         }
     }
-}
-
-
-public extension Promise {
     
     public typealias PendingTuple = (promise: Promise, fulfill: (FulfilledValue) -> Void, reject: (Error) -> Void)
     
@@ -77,10 +72,7 @@ public extension Promise {
         let promise = Promise { fulfill = $0; reject = $1 }
         return (promise, fulfill, reject)
     }
-}
 
-
-public extension Promise {
     public init(value: FulfilledValue) {
         self.init {
             fulfill, reject in
@@ -96,7 +88,7 @@ public extension Promise {
     
 }
 
-
+// Two implementations of then are needed, depending upon whether the body is synchronous or asynchronous:
 public extension Promise {
     
     public func then<NewFulfilledValue>(
@@ -133,8 +125,10 @@ public extension Promise {
             }
         }
     }
+}
 
-
+// Catch and recover handle errors. The latter allows an error to be turned back into success:
+public extension Promise {
     @discardableResult
     public func `catch`(
         on q: DispatchQueue  = BasicPromise<Void>.defaultQueue,
@@ -184,8 +178,10 @@ public extension Promise {
         }
         return newPromise
     }
-    
-    
+}
+
+// Tap and always provide points to observe a chain of results no matter whether things are failing or succeeding:
+public extension Promise {
     public func tap(
         on q: DispatchQueue  = BasicPromise<Void>.defaultQueue,
         execute body: @escaping (Result<FulfilledValue>) -> Void
