@@ -170,20 +170,77 @@ class MiniPromiseKitTests: XCTestCase {
         }
         waitForExpectations(timeout: 5, handler: { _ in  })
     }
+    func testNoRecoverSuccess() {
+        let expectation1 = expectation(description: "Get all the user feeds")
+        
+        _ = firstly { Promise(value: "Awesome") }
+            .recover { (Error) -> String in
+                XCTFail()
+                return "no"
+            }
+            .then {
+                XCTAssert( $0 == "Awesome")
+                expectation1.fulfill()
+                return
+            }
+            .catch { _ in XCTFail() }
+        waitForExpectations(timeout: 5, handler: { _ in  })
+    }
+    func testRecoverSyncSuccess() {
+        let expectation1 = expectation(description: "Get all the user feeds")
+        
+        _ = firstly {   (Void) throws -> Promise<String> in   throw TestError.thenAsyncFailure  }
+            .recover { (e: Error) -> String in
+                XCTAssert(e as? TestError == .thenAsyncFailure)
+                return "yes"
+            }
+            .then {
+                XCTAssert( $0 == "yes")
+                expectation1.fulfill()
+                return
+            }
+            .catch { _ in XCTFail() }
+        waitForExpectations(timeout: 5, handler: { _ in  })
+    }
+    func testRecoverAsyncSuccess() {
+        let expectation1 = expectation(description: "Get all the user feeds")
+        
+        _ = firstly {   (Void) throws -> Promise<String> in   throw TestError.thenAsyncFailure  }
+            .recover { (e: Error) -> Promise<String> in
+                XCTAssert(e as? TestError == .thenAsyncFailure)
+                return Promise<String> {
+                    fulfill, reject in
+                    DispatchQueue.global(qos: .userInitiated).async {
+                        fulfill("yes")
+                    }
+                }
+            }
+            .then {
+                XCTAssert( $0 == "yes")
+                expectation1.fulfill()
+                return
+            }
+            .catch { _ in XCTFail() }
+        waitForExpectations(timeout: 5, handler: { _ in  })
+    }
+
 
 
     static var allTests : [(String, (MiniPromiseKitTests) -> () throws -> Void)] {
         return [
-            ("testFirstlySuccess",    testFirstlySuccess),
-            ("testFirstlyFailure",    testFirstlyFailure),
-            ("testAlwaysSuccess",     testAlwaysSuccess),
-            ("testAlwaysFailure",     testAlwaysFailure),
-            ("testTapSuccess",        testTapSuccess),
-            ("testTapFailure",        testTapFailure),
-            ("testThenSyncSuccess",   testThenSyncSuccess),
-            ("testThenSyncFailure",   testThenSyncFailure),
-            ("testThenAsyncSuccess",  testThenAsyncSuccess),
-            ("testThenAsyncFailure",  testThenAsyncFailure),
+            ("testFirstlySuccess",      testFirstlySuccess),
+            ("testFirstlyFailure",      testFirstlyFailure),
+            ("testAlwaysSuccess",       testAlwaysSuccess),
+            ("testAlwaysFailure",       testAlwaysFailure),
+            ("testTapSuccess",          testTapSuccess),
+            ("testTapFailure",          testTapFailure),
+            ("testThenSyncSuccess",     testThenSyncSuccess),
+            ("testThenSyncFailure",     testThenSyncFailure),
+            ("testThenAsyncSuccess",    testThenAsyncSuccess),
+            ("testThenAsyncFailure",    testThenAsyncFailure),
+            ("testNoRecoverSuccess",    testNoRecoverSuccess),
+            ("testRecoverSyncSuccess",  testRecoverSyncSuccess),
+            ("testRecoverAsyncSuccess", testRecoverAsyncSuccess),
        ]
     }
 }
