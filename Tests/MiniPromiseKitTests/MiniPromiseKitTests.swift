@@ -12,6 +12,8 @@
  */
 
 import XCTest
+import Dispatch
+
 @testable import MiniPromiseKit
 
 let queue = DispatchQueue(label: "com.example.todolist")
