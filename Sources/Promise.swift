@@ -110,7 +110,7 @@ public extension Promise {
     {
         return Promise<NewFulfilledValue> {
             fulfill, reject in
-            _ = basicPromise.then(on: q) {  // calling the "then" with a null body
+            _ = basicPromise.then(on: q) {
                 result -> Void in
                 _ = result
                     .catch { (e: Error) -> Void in reject(e) }
@@ -121,7 +121,7 @@ public extension Promise {
                                 .catch(on: q, execute: reject )
                         }
                         catch { reject(error) }
-                    }
+                }
             }
         }
     }

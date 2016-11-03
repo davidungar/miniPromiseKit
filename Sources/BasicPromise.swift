@@ -72,8 +72,10 @@ public class BasicPromise<Outcome> {
     
     public func then<NewOutcome>(
         on q: DispatchQueue = BasicPromise.defaultQueue,
-        execute transformer: @escaping (Outcome) -> NewOutcome
-        ) -> BasicPromise<NewOutcome>
+        execute transformer:
+            @escaping (Outcome) -> NewOutcome
+        )
+        -> BasicPromise<NewOutcome>
     {
         let p = BasicPromise<NewOutcome>()
         then(on: q) { p.fulfill( transformer( $0 ) ) }
