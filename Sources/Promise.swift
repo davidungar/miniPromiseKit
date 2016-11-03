@@ -12,6 +12,7 @@
  */
 
 import Foundation
+import Dispatch
 
 public func firstly<FulfilledValue>(
     execute body: () throws -> Promise<FulfilledValue>

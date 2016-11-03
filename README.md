@@ -2,6 +2,10 @@
 
 A simplified subset of the [PromiseKit](https://github.com/mxcl/PromiseKit) library for an upcoming book
 
+[![Build Status](https://travis-ci.org/davidungar/miniPromiseKit.svg?branch=master)](https://travis-ci.org/davidungar/miniPromiseKit)
+![](https://img.shields.io/badge/Swift-3.0%20RELEASE-orange.svg?style=flat)
+![](https://img.shields.io/badge/platform-Linux,%20macOS-blue.svg?style=flat)
+
 ## Basic usage
 
 Creating promises:

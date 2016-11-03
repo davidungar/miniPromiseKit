@@ -12,6 +12,7 @@
  */
 
 import Foundation
+import Dispatch
 
 // A BasicPromise handles any type of Outcome, and doesn't help deal with about errors.
 
