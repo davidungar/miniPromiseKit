@@ -65,7 +65,7 @@ public extension Result {
 }
 
 
-public extension Result { // not for book
+public extension Result {
     
     // Could add in all of the Promise protocol
     // The following is not needed for the book.
