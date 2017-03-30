@@ -51,8 +51,9 @@ public extension Promise {
         )
     {
         self.init()
+        let bP = basicPromise // fix for EXC_BAD_ACCESS after update to Swift 3.1 (in func fulfullBasic)
         func fulfillBasic(_ r: Result< FulfilledValue >) {
-            basicPromise.fulfill(r)
+            bP.fulfill(r)
         }
         do {
             try resolvers(
