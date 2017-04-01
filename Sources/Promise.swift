@@ -51,7 +51,7 @@ public extension Promise {
         )
     {
         self.init()
-        let bP = basicPromise // fix for EXC_BAD_ACCESS after update to Swift 3.1 (in func fulfullBasic)
+        let bP = basicPromise // fix for EXC_BAD_ACCESS after update to Swift 3.1 (in func fulfillBasic)
         func fulfillBasic(_ r: Result< FulfilledValue >) {
             bP.fulfill(r)
         }
