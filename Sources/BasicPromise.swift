@@ -31,7 +31,7 @@ public class BasicPromise<Outcome> {
         fn()
     }
     
-    internal static var defaultQueue: DispatchQueue {
+    public static var defaultQueue: DispatchQueue {
         get { return defaultQ }
         set { defaultQ = newValue }
     }
