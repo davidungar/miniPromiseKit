@@ -61,12 +61,10 @@ public extension Result {
         }
         return self
     }
-
 }
 
 
 public extension Result {
-    
     // Could add in all of the Promise protocol
     // The following is not needed for the book.
     // Why do the bodies not get to transform the result??
@@ -83,4 +81,11 @@ public extension Result {
     }
 }
 
-
+public extension Result {
+    public var errorOrNil: Error? {
+        switch self {
+        case .rejected(let e): return e
+        case .fulfilled: return nil
+        }
+    }
+}
