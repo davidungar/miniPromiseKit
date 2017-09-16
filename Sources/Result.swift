@@ -52,12 +52,12 @@ public extension Result {
         }
     }
     @discardableResult
-    public func `catch`( execute body: (Error) -> Void) -> Result {
+    public func `catch`( execute body: (Error) throws -> Void) rethrows -> Result {
         switch self {
         case .fulfilled:
             break
         case .rejected(let e):
-            body(e)
+            try body(e)
         }
         return self
     }
