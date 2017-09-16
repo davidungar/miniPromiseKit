@@ -13,8 +13,22 @@
 
 import Foundation
 
+// Abstract to a protocol for collection extensions
+public protocol ResultProtocol {
+    associatedtype FulfilledValue
+    // SOMEDAY: make then return a ResultProtocol
+    func then<NewFulfilledValue>( execute body: (FulfilledValue) throws -> NewFulfilledValue )  -> Result<NewFulfilledValue>
+    func getOrThrow() throws -> FulfilledValue
+    func recover(execute body: (Error) throws -> FulfilledValue) -> Self
+    func `catch`( execute body: (Error) throws -> Void) rethrows -> Self
+    
+    func tap( execute body: (Self) -> Void ) -> Self
+    func always( execute body: () -> Void ) -> Self
+    var errorOrNil: Error? {get}
+}
 
-public enum Result<FulfilledValue> {
+public enum Result<FulfilledValueParameter> {
+    public typealias FulfilledValue = FulfilledValueParameter
     case fulfilled(FulfilledValue)
     case rejected(Error)
 }
@@ -37,6 +51,14 @@ public extension Result {
         case .fulfilled(let r):
             do    { return try .fulfilled( body(r) ) }
             catch { return     .rejected( error   ) }
+        }
+    }
+    public func getOrThrow() throws -> FulfilledValue {
+        switch self {
+        case .rejected(let e):
+            throw e
+        case .fulfilled(let r):
+            return r
         }
     }
 }
@@ -89,3 +111,5 @@ public extension Result {
         }
     }
 }
+
+extension Result: ResultProtocol {}
